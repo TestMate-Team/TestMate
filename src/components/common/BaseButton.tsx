@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 interface BaseButtonProps {
   to?: string;
-  variant?: "primary" | "outline";
+  variant?: "primary" | "outline" | "secondary";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   children?: React.ReactNode;
@@ -36,7 +36,7 @@ export function BaseButton({
 }: BaseButtonProps) {
   // ベースとなるスタイルクラス
   const baseClasses =
-    "rounded-md whitespace-nowrap transition-colors duration-200";
+    "rounded-md whitespace-nowrap transition-colors duration-200 inline-flex justify-center items-center";
 
   // サイズに基づくクラス
   const sizeClasses = {
@@ -50,6 +50,8 @@ export function BaseButton({
       "bg-primary-400 hover:bg-primary-500 text-white disabled:bg-primary-200",
     outline:
       "border border-primary-400 text-primary-400 hover:bg-primary-100 disabled:opacity-50",
+    secondary:
+      "bg-gray-200 text-gray-800 hover:bg-gray-300 disabled:bg-gray-100",
   };
 
   // スタイルを組み合わせる
@@ -58,7 +60,7 @@ export function BaseButton({
   // Linkとして描画
   if (to) {
     return (
-      <Link to={to} className={buttonClasses} {...rest}>
+      <Link to={to} className={`${buttonClasses} block text-center`} {...rest}>
         {children}
       </Link>
     );
