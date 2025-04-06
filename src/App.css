@@ -1,0 +1,17 @@
+/* ヘッダーのレスポンシブ対応用スタイル */
+@media (min-width: 768px) {
+  /* md以上のサイズ */
+  .md-header-fixed {
+    width: 100%;
+    max-width: 640px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  /* lg以上のサイズ */
+  .md-header-fixed {
+    max-width: 768px;
+  }
+}
