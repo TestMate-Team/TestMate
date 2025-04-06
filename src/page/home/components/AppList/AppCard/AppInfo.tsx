@@ -1,34 +1,25 @@
 import { AppItem } from "@/types/appItem";
 
-import { AppMetric, MetricType } from "./AppMetric";
+import { AppMetric } from "./AppMetric";
 
 interface AppInfoProps {
   appItem: AppItem;
   showMetrics?: boolean;
-  metricTypes?: MetricType[];
-  metricCounts?: Record<MetricType, number>;
   initialFavorite?: boolean;
-  onFavoriteToggle?: (isActive: boolean) => void;
   className?: string;
 }
 
 export function AppInfo({
   appItem,
   showMetrics = true,
-  metricTypes = ["chat", "tester", "favorite"],
-  metricCounts = { chat: 44, tester: 44, favorite: 44 },
   initialFavorite = false,
-  onFavoriteToggle,
   className = "",
 }: AppInfoProps) {
+  const metricCounts = { chat: 44, tester: 44, favorite: 44 };
   const handleFavoriteToggle = (isActive: boolean) => {
-    if (onFavoriteToggle) {
-      onFavoriteToggle(isActive);
-    } else {
-      console.log(
-        `${appItem.title}のお気に入りを${isActive ? "追加" : "解除"}しました`,
-      );
-    }
+    console.log(
+      `${appItem.title}のお気に入りを${isActive ? "追加" : "解除"}しました`,
+    );
   };
 
   return (
@@ -51,22 +42,14 @@ export function AppInfo({
 
           {showMetrics && (
             <div className="flex mt-1 sm:mt-2 space-x-2 sm:space-x-3 md:space-x-4">
-              {metricTypes.includes("chat") && (
-                <AppMetric type="chat" count={metricCounts.chat} />
-              )}
-
-              {metricTypes.includes("tester") && (
-                <AppMetric type="tester" count={metricCounts.tester} />
-              )}
-
-              {metricTypes.includes("favorite") && (
-                <AppMetric
-                  type="favorite"
-                  count={metricCounts.favorite}
-                  initialActive={initialFavorite}
-                  onToggle={handleFavoriteToggle}
-                />
-              )}
+              <AppMetric type="chat" count={metricCounts.chat} />
+              <AppMetric type="tester" count={metricCounts.tester} />
+              <AppMetric
+                type="favorite"
+                count={metricCounts.favorite}
+                initialActive={initialFavorite}
+                onToggle={handleFavoriteToggle}
+              />
             </div>
           )}
         </div>
