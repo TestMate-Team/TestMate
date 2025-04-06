@@ -5,12 +5,15 @@ import { AppItem } from "@/types/appItem";
 export function AppCard({ appItem }: { appItem: AppItem }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const toggleFavorite = () => {
+  const toggleFavorite = (e: React.MouseEvent) => {
+    // クリックイベントが親要素（Link）に伝播しないようにする
+    e.stopPropagation();
+    e.preventDefault();
     setIsFavorite(!isFavorite);
   };
 
   return (
-    <div className="flex items-center p-2 sm:p-3 md:p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex items-center p-2 sm:p-3 md:p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mr-2 sm:mr-3 md:mr-4 flex-shrink-0">
         <img
           src={appItem.iconUrl}

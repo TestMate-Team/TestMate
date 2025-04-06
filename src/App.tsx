@@ -4,9 +4,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
 import { HomePage } from "@/page/home";
+import { AppDetailPage } from "@/page/home/components/AppDetail";
+import { NotFound } from "@/page/NotFound";
 import { PostPage } from "@/page/posts";
-
-import { NotFound } from "./page/NotFound";
 
 function App() {
   return (
@@ -18,6 +18,7 @@ function App() {
           <main className="pt-17 md:pt-20 px-4 shadow-md min-h-screen">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/:id" element={<AppDetailPage />} />
               <Route path="/posts" element={<PostPage />} />
               {/* 404ページ */}
               <Route path="*" element={<NotFound />} />
