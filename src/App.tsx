@@ -11,11 +11,11 @@ import { NotFound } from "./page/NotFound";
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen items-center bg-white">
+      <div className="flex flex-col min-h-screen items-center">
         {/* モバイルでは最大幅448px、タブレットでは640px、デスクトップでは768pxに設定 */}
-        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl shadow-md relative">
+        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl relative bottom-1">
           <Header />
-          <main className="pt-16 md:pt-20 px-4">
+          <main className="pt-17 md:pt-20 px-4 shadow-md min-h-screen">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/posts" element={<PostPage />} />

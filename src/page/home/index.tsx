@@ -1,11 +1,23 @@
+import { AppData } from "@/types/appItem";
+
+import { AppCard } from "./components/AppCard";
+
 // ホームページコンポーネント
+const appData: AppData = {
+  id: 1,
+  title: "TestMate",
+  shortDescription: "あなたのテストをもっと楽しく",
+  iconUrl: "/images/testmate.svg",
+};
 export function HomePage() {
   return (
-    <div>
-      <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">
-        Vite + React
-      </h1>
-      <p className="mt-4">ホームページのコンテンツです</p>
+    <div className="h-min-screen">
+      <p>input Field</p>
+      <p>絞り込み</p>
+      <p>ソート</p>
+      <div>
+        <AppCard appData={appData} />
+      </div>
     </div>
   );
 }
