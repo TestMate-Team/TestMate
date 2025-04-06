@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import { BaseButton } from "@/components/common/BaseButton";
 import { Dropdown } from "@/components/common/Dropdown";
-import { AppData } from "@/types/appItem";
+import { AppItem } from "@/types/appItem";
 
-import { AppCard } from "./components/AppCard";
+import { AppList } from "./components/AppList";
 
 // ホームページコンポーネント
-const appData: AppData[] = [
+const appData: AppItem[] = [
   {
     id: 1,
     title: "testmate",
@@ -136,11 +136,7 @@ export function HomePage() {
       </div>
 
       {/* アプリケーション一覧 */}
-      <div className="space-y-4">
-        {appData.map((app) => (
-          <AppCard key={app.id + app.title} appData={app} />
-        ))}
-      </div>
+      <AppList appData={appData} />
     </div>
   );
 }

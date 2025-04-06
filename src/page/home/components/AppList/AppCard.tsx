@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { AppData } from "@/types/appItem";
+import { AppItem } from "@/types/appItem";
 
-export function AppCard({ appData }: { appData: AppData }) {
+export function AppCard({ appItem }: { appItem: AppItem }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const toggleFavorite = () => {
@@ -13,17 +13,17 @@ export function AppCard({ appData }: { appData: AppData }) {
     <div className="flex items-center p-2 sm:p-3 md:p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mr-2 sm:mr-3 md:mr-4 flex-shrink-0">
         <img
-          src={appData.iconUrl}
+          src={appItem.iconUrl}
           alt="アプリのアイコン"
           className="w-full h-full object-cover rounded-md"
         />
       </div>
       <div className="flex-1 min-w-0">
         <h2 className="text-base sm:text-lg md:text-xl font-bold truncate">
-          {appData.title}
+          {appItem.title}
         </h2>
         <p className="text-xs sm:text-sm text-gray-600 line-clamp-1 sm:line-clamp-2">
-          {appData.shortDescription}
+          {appItem.shortDescription}
         </p>
         <div className="flex mt-1 sm:mt-2 space-x-2 sm:space-x-3 md:space-x-4">
           {/* Todo: 認証ユーザは直接タップで遷移 */}

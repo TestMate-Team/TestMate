@@ -1,4 +1,4 @@
-export interface AppData {
+export interface AppItem {
   id: number;
   title: string;
   shortDescription: string;
