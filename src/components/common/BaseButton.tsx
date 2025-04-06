@@ -68,7 +68,7 @@ export function BaseButton({
   return (
     <button
       type={type}
-      className={buttonClasses}
+      className={`${buttonClasses} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
       onClick={onClick}
       disabled={disabled}
       {...rest}
