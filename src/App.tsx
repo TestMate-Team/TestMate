@@ -1,8 +1,12 @@
 import "./App.css";
 
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
+import { HomePage } from "@/page/home";
+import { PostPage } from "@/page/posts";
+
+import { NotFound } from "./page/NotFound";
 
 function App() {
   return (
@@ -12,10 +16,12 @@ function App() {
         <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl shadow-md relative">
           <Header />
           <main className="pt-16 md:pt-20 px-4">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">
-              Vite + React
-            </h1>
-            {/* ここに他のコンテンツ */}
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/posts" element={<PostPage />} />
+              {/* 404ページ */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </main>
         </div>
       </div>
