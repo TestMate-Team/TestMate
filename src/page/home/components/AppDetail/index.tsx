@@ -10,10 +10,10 @@ export function AppDetailPage() {
   // 直書きのサンプルデータ
   const userName = "ゲスト";
   const app: AppItem = {
-    id: 2,
+    id: 1,
     title: "エクスプローラーズ",
     shortDescription: "街歩きリアル探索ゲーム",
-    iconUrl: "/images/explorers.svg",
+    iconUrl: "/images/testmate.svg",
     screenshots: ["/images/sample1.png", "/images/sample1.png"],
     longDescription:
       "街を歩きながら、リアルな探索を楽しめるゲームです。GPSを使って現実世界を冒険し、隠されたアイテムやミッションを発見しましょう。友達と一緒に遊べば、より楽しい体験が待っています。オフラインでも遊べるので、Wi-Fi環境がなくても心配ありません。",
@@ -44,26 +44,29 @@ export function AppDetailPage() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        {/* AppCardコンポーネントを再利用 */}
-        <div className="border-b pb-4">
-          <AppInfo appItem={app} />
-        </div>
-
-        {/* 開発者情報 */}
-        <div className="p-4 flex items-center">
-          <div className="w-10 h-10 rounded-full bg-gray-300 mr-3 overflow-hidden">
-            <img
-              src="/images/avatar.png"
-              alt="開発者"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/icons/Person.svg";
-              }}
-            />
+        {/* アプリ情報と開発者情報を横並びに - レスポンシブ対応版 */}
+        <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b">
+          {/* AppInfoコンポーネントを再利用 */}
+          <div className="flex-grow mb-4 sm:mb-0">
+            <AppInfo appItem={app} />
           </div>
-          <div>
-            <div className="font-semibold">{userName}</div>
+
+          {/* 開発者情報 - レスポンシブ対応版 */}
+          <div className="flex items-center sm:flex-col sm:items-center self-start sm:self-auto">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gray-300 overflow-hidden">
+              <img
+                src="/images/avatar.png"
+                alt="開発者"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/icons/Person.svg";
+                }}
+              />
+            </div>
+            <div className="ml-3 sm:ml-0 sm:mt-2 sm:text-center">
+              <div className="font-medium text-sm sm:text-base">{userName}</div>
+            </div>
           </div>
         </div>
 
