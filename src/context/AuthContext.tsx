@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Supabaseの認証状態変更リスナー
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
