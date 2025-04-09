@@ -62,7 +62,6 @@ export default defineConfig([
           selector: "variable",
           types: ["function"],
           format: ["camelCase"],
-          prefix: ["use"],
           filter: {
             regex: "^use[A-Z]",
             match: true,

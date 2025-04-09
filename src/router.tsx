@@ -1,6 +1,12 @@
+// src/router.tsx
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
+import {
+  ProtectedRoute,
+  PublicOnlyRoute,
+} from "@/components/route/ProtectedRoute";
+import { AuthProvider } from "@/context/AuthContext";
 import { LoginPage } from "@/page/Auth/Login";
 import { RegisterPage } from "@/page/Auth/Register";
 import { HomePage } from "@/page/home";
@@ -43,25 +49,46 @@ const RootLayout = () => {
 // ルーターの定義
 export const router = createBrowserRouter([
   {
-    // ルート要素として共通レイアウトを使用
-    element: <RootLayout />,
+    // ルート要素として共通レイアウトとAuthProviderを使用
+    element: (
+      <AuthProvider>
+        <RootLayout />
+      </AuthProvider>
+    ),
     children: [
-      // メインレイアウトを使用するルート（ヘッダーあり）
+      // 認証が必要なルート（ProtectedRouteで保護）
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            element: <MainLayout />,
+            children: [
+              { path: "/posts", element: <PostPage /> },
+              // その他の認証が必要なルート
+            ],
+          },
+        ],
+      },
+      // 非認証ユーザー専用ルート（ログイン済みの場合はリダイレクト）
+      {
+        element: <PublicOnlyRoute />,
+        children: [
+          {
+            element: <AuthLayout />,
+            children: [
+              { path: "/login", element: <LoginPage /> },
+              { path: "/register", element: <RegisterPage /> },
+            ],
+          },
+        ],
+      },
+      // 認証状態に関わらずアクセス可能なルート
       {
         element: <MainLayout />,
         children: [
           { path: "/", element: <HomePage /> },
-          { path: "/posts", element: <PostPage /> },
           { path: "/:id", element: <AppDetailPage /> },
           { path: "*", element: <NotFound /> },
-        ],
-      },
-      // 認証レイアウトを使用するルート（ヘッダーなし）
-      {
-        element: <AuthLayout />,
-        children: [
-          { path: "/login", element: <LoginPage /> },
-          { path: "/register", element: <RegisterPage /> },
         ],
       },
     ],
