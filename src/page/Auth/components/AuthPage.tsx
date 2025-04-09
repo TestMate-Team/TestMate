@@ -1,7 +1,17 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "@/context/AuthContext";
 
 export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
+
+  // フォーム状態の管理
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleMode = () => {
     if (isLogin) {
@@ -9,6 +19,44 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
     } else {
       navigate("/login");
     }
+  };
+
+  // フォーム送信処理
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        // ログイン処理
+        const { success, error } = await login(email, password);
+        if (!success && error) {
+          setError(error);
+        }
+      } else {
+        // 新規登録処理
+        const { success, error } = await register(email, password);
+        if (!success && error) {
+          setError(error);
+        }
+      }
+    } catch (err) {
+      setError(
+        isLogin
+          ? "ログイン中にエラーが発生しました"
+          : "アカウント作成中にエラーが発生しました",
+      );
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Googleログイン処理（将来的に実装）
+  const handleGoogleAuth = () => {
+    // この部分は現在の要件に含まれていないため、プレースホルダーとしています
+    alert("Googleログイン機能は準備中です");
   };
 
   return (
@@ -22,7 +70,13 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
           {isLogin ? "ログイン" : "アカウント作成"}
         </h2>
 
-        <form className="space-y-4">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p>{error}</p>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="email"
@@ -33,8 +87,11 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
             <input
               type="email"
               id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
+              autoComplete="email"
             />
           </div>
 
@@ -48,14 +105,21 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
             <input
               type="password"
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
+              minLength={6}
+              autoComplete={isLogin ? "current-password" : "new-password"}
             />
           </div>
 
           {isLogin && (
             <div className="text-right">
-              <a href="#" className="text-sm text-teal-600 hover:text-teal-800">
+              <a
+                href="/reset-password"
+                className="text-sm text-teal-600 hover:text-teal-800"
+              >
                 パスワードをお忘れですか?
               </a>
             </div>
@@ -63,9 +127,16 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
 
           <button
             type="submit"
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            disabled={isLoading}
+            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-teal-300 disabled:cursor-not-allowed"
           >
-            {isLogin ? "ログイン" : "アカウント新規作成"}
+            {isLoading
+              ? isLogin
+                ? "ログイン中..."
+                : "アカウント作成中..."
+              : isLogin
+                ? "ログイン"
+                : "アカウント新規作成"}
           </button>
 
           <div className="relative flex items-center justify-center my-4">
@@ -77,6 +148,7 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
 
           <button
             type="button"
+            onClick={handleGoogleAuth}
             className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
           >
             <svg
