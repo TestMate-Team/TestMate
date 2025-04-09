@@ -79,6 +79,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 登録処理
   const register = async (email: string, password: string) => {
     try {
+      // 先にメールアドレスの存在チェックを行う
+      const emailExists = await authService.checkEmailExists(email);
+
+      if (emailExists) {
+        return {
+          success: false,
+          error: "このメールアドレスは既に登録されています",
+        };
+      }
+
       const { data: user, error } = await authService.register(email, password);
 
       if (error) {

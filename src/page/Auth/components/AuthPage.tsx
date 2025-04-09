@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
+import { authService } from "@/lib/api/authService";
 
 export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
   const toggleMode = () => {
     if (isLogin) {
@@ -21,10 +24,42 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
     }
   };
 
+  // メールアドレスの存在チェック
+  const checkEmailExists = async (emailToCheck: string) => {
+    if (!emailToCheck || isLogin || !emailToCheck.includes("@")) return;
+
+    try {
+      setIsCheckingEmail(true);
+      setEmailError(null); // チェック後に結果が来るまでエラーをクリア
+
+      console.log(`Checking email existence: ${emailToCheck}`);
+      const exists = await authService.checkEmailExists(emailToCheck);
+      console.log(`Email exists check result: ${exists}`);
+
+      if (exists) {
+        setEmailError("このメールアドレスは既に登録されています");
+      } else {
+        setEmailError(null);
+      }
+    } catch (err) {
+      console.error("メールチェックエラー:", err);
+      // エラーが発生した場合はユーザーに表示しない
+      setEmailError(null);
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
   // フォーム送信処理
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+
+    // 新規登録でメールアドレスエラーがある場合は処理を中止
+    if (!isLogin && emailError) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -52,6 +87,11 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
       setIsLoading(false);
     }
   };
+
+  // メールアドレスが変更されたらエラーをクリア
+  useEffect(() => {
+    setEmailError(null);
+  }, [email]);
 
   // Googleログイン処理（将来的に実装）
   const handleGoogleAuth = () => {
@@ -89,10 +129,19 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              onBlur={(e) => checkEmailExists(e.target.value)}
+              className={`w-full px-3 py-2 border ${emailError ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 ${emailError ? "focus:ring-red-500" : "focus:ring-teal-500"}`}
               required
               autoComplete="email"
             />
+            {emailError && (
+              <p className="mt-1 text-sm text-red-600">{emailError}</p>
+            )}
+            {isCheckingEmail && (
+              <p className="mt-1 text-sm text-gray-500">
+                メールアドレスを確認中...
+              </p>
+            )}
           </div>
 
           <div>
@@ -113,6 +162,19 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
               autoComplete={isLogin ? "current-password" : "new-password"}
             />
           </div>
+          {!isLogin && (
+            <div className="text-sm text-gray-600 mt-2">
+              <p>パスワードは以下の要件を満たす必要があります：</p>
+              <ul className="list-disc list-inside ml-2">
+                <li>小文字を1文字以上含む</li>
+                <li>大文字を1文字以上含む</li>
+                <li>数字を1文字以上含む</li>
+                <li>
+                  記号（!@#$%^&amp;*(),.?&quot;:{}|&lt;&gt;）を1文字以上含む
+                </li>
+              </ul>
+            </div>
+          )}
 
           {isLogin && (
             <div className="text-right">
@@ -127,7 +189,7 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (!isLogin && emailError !== null)}
             className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-teal-300 disabled:cursor-not-allowed"
           >
             {isLoading
