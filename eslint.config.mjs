@@ -3,6 +3,7 @@ import { defineConfig } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier";
 import pluginReact from "eslint-plugin-react";
 import pluginSimpleImportSort from "eslint-plugin-simple-import-sort";
+import pluginUnicorn from "eslint-plugin-unicorn";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -28,7 +29,6 @@ export default defineConfig([
         ecmaFeatures: {
           jsx: true,
         },
-        // projectの代わりにprojectServiceを使用
         projectService: true,
       },
     },
@@ -103,6 +103,37 @@ export default defineConfig([
       },
     },
     extends: [pluginReact.configs.flat.recommended],
+  },
+  // Unicornプラグインの設定
+  {
+    files: ["**/*.ts"],
+    plugins: {
+      unicorn: pluginUnicorn,
+    },
+    rules: {
+      "unicorn/filename-case": [
+        "error",
+        {
+          case: "camelCase",
+        },
+      ],
+    },
+    ignores: ["vite-env.d.ts", "**/*.d.ts"], // 型定義ファイルは除外
+  },
+  {
+    files: ["**/*.tsx"],
+    plugins: {
+      unicorn: pluginUnicorn,
+    },
+    rules: {
+      "unicorn/filename-case": [
+        "error",
+        {
+          case: "pascalCase",
+          ignore: ["main.tsx", "router.tsx", "index.tsx"], // 特定のファイルを除外
+        },
+      ],
+    },
   },
   eslintConfigPrettier,
   {
