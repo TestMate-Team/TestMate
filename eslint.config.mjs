@@ -17,17 +17,26 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
   },
-  tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
-  eslintConfigPrettier,
+  // TypeScriptファイル用の設定
   {
-    plugins: {
-      "simple-import-sort": pluginSimpleImportSort,
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: {
+          jsx: true,
+        },
+        // projectの代わりにprojectServiceを使用
+        projectService: true,
+      },
     },
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
+    extends: [...tseslint.configs.recommended],
     rules: {
-      "react/react-in-jsx-scope": "off",
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
       "@typescript-eslint/naming-convention": [
         "error",
@@ -36,9 +45,9 @@ export default defineConfig([
           selector: "variable",
           types: ["function"],
           format: ["PascalCase"],
-          modifiers: ["exported"],
           filter: {
-            regex: "^[A-Z]",
+            regex:
+              "^[A-Z][a-zA-Z0-9]*(?:Layout|Page|Component|Provider|Context|Router|Container|Wrapper|List|Item|Form|Modal|Button|Icon|View)$",
             match: true,
           },
         },
@@ -69,7 +78,41 @@ export default defineConfig([
           selector: "enumMember",
           format: ["UPPER_CASE", "PascalCase"],
         },
+        // 関数宣言の命名規則
+        {
+          selector: "function",
+          format: ["camelCase", "PascalCase"],
+          filter: {
+            regex:
+              "^[A-Z][a-zA-Z0-9]*(?:Layout|Page|Component|Provider|Context|Router|Container|Wrapper|List|Item|Form|Modal|Button|Icon|View)$",
+            match: true,
+          },
+        },
       ],
+    },
+  },
+  // Reactファイル用の設定
+  {
+    files: ["**/*.{jsx,tsx}"],
+    plugins: {
+      react: pluginReact,
+    },
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
+    extends: [pluginReact.configs.flat.recommended],
+  },
+  eslintConfigPrettier,
+  {
+    plugins: {
+      "simple-import-sort": pluginSimpleImportSort,
+    },
+    rules: {
+      "react/react-in-jsx-scope": "off",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
     },
   },
   {
