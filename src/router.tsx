@@ -1,4 +1,3 @@
-// src/router.tsx
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
@@ -87,7 +86,7 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "/", element: <HomePage /> },
-          { path: "/:id", element: <AppDetailPage /> },
+          { path: "/app/:id", element: <AppDetailPage /> },
           { path: "*", element: <NotFound /> },
         ],
       },
