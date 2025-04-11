@@ -6,7 +6,7 @@ import { authService } from "@/lib/api/authService";
 
 export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, register, loginWithGoogle } = useAuth();
 
   // フォーム状態の管理
   const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const toggleMode = () => {
     if (isLogin) {
@@ -93,10 +94,24 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
     setEmailError(null);
   }, [email]);
 
-  // Googleログイン処理（将来的に実装）
-  const handleGoogleAuth = () => {
-    // この部分は現在の要件に含まれていないため、プレースホルダーとしています
-    alert("Googleログイン機能は準備中です");
+  // Googleログイン処理
+  const handleGoogleAuth = async () => {
+    setError(null);
+    setIsGoogleLoading(true);
+
+    try {
+      const { success, error } = await loginWithGoogle();
+      if (!success && error) {
+        setError(error);
+      }
+      // 成功した場合はGoogle認証画面にリダイレクトされるので、
+      // ここで何かする必要はありません
+    } catch (err) {
+      setError("Google認証中にエラーが発生しました");
+      console.error(err);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -211,7 +226,8 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
           <button
             type="button"
             onClick={handleGoogleAuth}
-            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
+            disabled={isGoogleLoading}
+            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -235,9 +251,11 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            {isLogin
-              ? "Googleアカウントでログイン"
-              : "Googleアカウントで新規作成"}
+            {isGoogleLoading
+              ? "処理中..."
+              : isLogin
+                ? "Googleアカウントでログイン"
+                : "Googleアカウントで新規作成"}
           </button>
         </form>
 

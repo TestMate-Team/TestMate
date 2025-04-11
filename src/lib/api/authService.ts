@@ -187,6 +187,25 @@ export const authService = {
     return { data: data.session, error: null };
   },
 
+  // Googleでログイン
+  async loginWithGoogle(): Promise<AuthResponse<null>> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}`,
+      },
+    });
+
+    if (error) {
+      return {
+        data: null,
+        error: { message: translateAuthError(error.message) },
+      };
+    }
+
+    return { data: null, error: null };
+  },
+
   // メールアドレスの重複チェック（Edge Functionを使用）
   async checkEmailExists(email: string): Promise<boolean> {
     try {

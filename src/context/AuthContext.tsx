@@ -23,6 +23,7 @@ interface AuthContextType {
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -103,6 +104,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Google認証でログイン
+  const loginWithGoogle = async () => {
+    try {
+      const { error } = await authService.loginWithGoogle();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      // Google認証は別ウィンドウでリダイレクトするため、すぐにナビゲートせず
+      // Supabaseの認証状態変更リスナーがユーザー状態を更新するのを待ちます
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  };
+
   // ログアウト処理
   const logout = async () => {
     try {
@@ -115,7 +133,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        loginWithGoogle,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
