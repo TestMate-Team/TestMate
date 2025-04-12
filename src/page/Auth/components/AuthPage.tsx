@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { BaseButton } from "@/components/common/BaseButton";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/lib/api/authService";
+import { validatePassword } from "@/lib/utils/errorHandler";
 
 export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const toggleMode = () => {
     if (isLogin) {
@@ -33,21 +36,39 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
       setIsCheckingEmail(true);
       setEmailError(null); // チェック後に結果が来るまでエラーをクリア
 
-      console.log(`Checking email existence: ${emailToCheck}`);
       const exists = await authService.checkEmailExists(emailToCheck);
-      console.log(`Email exists check result: ${exists}`);
 
       if (exists) {
         setEmailError("このメールアドレスは既に登録されています");
       } else {
         setEmailError(null);
       }
-    } catch (err) {
-      console.error("メールチェックエラー:", err);
+    } catch {
       // エラーが発生した場合はユーザーに表示しない
       setEmailError(null);
     } finally {
       setIsCheckingEmail(false);
+    }
+  };
+
+  // パスワードバリデーション関数
+  const checkPassword = (passwordToCheck: string) => {
+    // ログイン時はバリデーションをスキップ
+    if (isLogin) {
+      setPasswordError(null); // ログイン時は常にエラーをクリア
+      return;
+    }
+
+    if (!passwordToCheck) {
+      setPasswordError(null);
+      return;
+    }
+
+    const validationResult = validatePassword(passwordToCheck);
+    if (!validationResult.isValid) {
+      setPasswordError(validationResult.error);
+    } else {
+      setPasswordError(null);
     }
   };
 
@@ -93,6 +114,11 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
   useEffect(() => {
     setEmailError(null);
   }, [email]);
+
+  // パスワードが変更されたらエラーをクリア
+  useEffect(() => {
+    setPasswordError(null);
+  }, [password]);
 
   // Googleログイン処理
   const handleGoogleAuth = async () => {
@@ -171,25 +197,16 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              onBlur={(e) => checkPassword(e.target.value)}
+              className={`w-full px-3 py-2 border ${passwordError ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 ${passwordError ? "focus:ring-red-500" : "focus:ring-teal-500"}`}
               required
               minLength={6}
               autoComplete={isLogin ? "current-password" : "new-password"}
             />
+            {passwordError && (
+              <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+            )}
           </div>
-          {!isLogin && (
-            <div className="text-sm text-gray-600 mt-2">
-              <p>パスワードは以下の要件を満たす必要があります：</p>
-              <ul className="list-disc list-inside ml-2">
-                <li>小文字を1文字以上含む</li>
-                <li>大文字を1文字以上含む</li>
-                <li>数字を1文字以上含む</li>
-                <li>
-                  記号（!@#$%^&amp;*(),.?&quot;:{}|&lt;&gt;）を1文字以上含む
-                </li>
-              </ul>
-            </div>
-          )}
 
           {isLogin && (
             <div className="text-right">
@@ -202,10 +219,15 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
             </div>
           )}
 
-          <button
+          <BaseButton
+            variant="primary"
+            size="lg"
+            disabled={
+              isLoading ||
+              (!isLogin && (emailError !== null || passwordError !== null))
+            }
+            className="w-full"
             type="submit"
-            disabled={isLoading || (!isLogin && emailError !== null)}
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-teal-300 disabled:cursor-not-allowed"
           >
             {isLoading
               ? isLogin
@@ -214,49 +236,30 @@ export function AuthPage({ isLogin }: { isLogin: boolean }) {
               : isLogin
                 ? "ログイン"
                 : "アカウント新規作成"}
-          </button>
+          </BaseButton>
 
-          <div className="relative flex items-center justify-center my-4">
-            <div className="border-t border-gray-300 absolute w-full"></div>
-            <span className="bg-white px-2 text-sm text-gray-500 relative">
-              または
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleGoogleAuth}
+          <BaseButton
+            variant="custom"
+            size="lg"
+            className="w-full bg-[#4285F4] text-white hover:bg-[#3367d6] relative flex items-center justify-center"
             disabled={isGoogleLoading}
-            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            onClick={handleGoogleAuth}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              className="w-5 h-5"
-            >
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            <div className="absolute left-1 top-1 bottom-1 h-[calc(100%-8px)] aspect-square bg-white rounded flex items-center justify-center">
+              <img
+                src="/icons/Google.svg"
+                alt="Google"
+                className="w-4/5 h-4/5 object-contain"
               />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            {isGoogleLoading
-              ? "処理中..."
-              : isLogin
-                ? "Googleアカウントでログイン"
-                : "Googleアカウントで新規作成"}
-          </button>
+            </div>
+            <span className="ml-10">
+              {isGoogleLoading
+                ? "処理中..."
+                : isLogin
+                  ? "Googleアカウントでログイン"
+                  : "Googleアカウントで新規作成"}
+            </span>
+          </BaseButton>
         </form>
 
         <div className="text-center mt-6">
