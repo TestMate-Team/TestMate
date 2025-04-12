@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 interface BaseButtonProps {
   to?: string;
-  variant?: "primary" | "outline" | "secondary";
+  variant?: "primary" | "outline" | "secondary" | "custom";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   children?: React.ReactNode;
@@ -52,6 +52,7 @@ export function BaseButton({
       "border border-primary-400 text-primary-400 hover:bg-primary-100 disabled:opacity-50",
     secondary:
       "bg-gray-200 text-gray-800 hover:bg-gray-300 disabled:bg-gray-100",
+    custom: "",
   };
 
   // スタイルを組み合わせる
