@@ -10,7 +10,7 @@ export function AppList({ appData }: { appData: AppItem[] }) {
       {appData.map((app) => (
         <Link
           key={app.id}
-          to={`/app/${app.id}`}
+          to={`/home/${app.id}`}
           className="block no-underline text-inherit"
         >
           <AppCard appItem={app} />

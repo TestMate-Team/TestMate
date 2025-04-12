@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
 import {
@@ -9,7 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { LoginPage } from "@/page/Auth/Login";
 import { RegisterPage } from "@/page/Auth/Register";
 import { HomePage } from "@/page/home";
-import { AppDetailPage } from "@/page/home/components/AppDetail";
+import { AppDetailPage } from "@/page/home/[id]";
 import { NotFound } from "@/page/NotFound";
 import { PostPage } from "@/page/posts";
 
@@ -85,8 +85,18 @@ export const router = createBrowserRouter([
       {
         element: <MainLayout />,
         children: [
-          { path: "/", element: <HomePage /> },
-          { path: "/app/:id", element: <AppDetailPage /> },
+          {
+            path: "/",
+            element: <Navigate to="/home" replace />,
+          },
+          {
+            path: "/home",
+            element: <HomePage />,
+          },
+          {
+            path: "/home/:id",
+            element: <AppDetailPage />,
+          },
           { path: "*", element: <NotFound /> },
         ],
       },
