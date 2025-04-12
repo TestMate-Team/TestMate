@@ -12,8 +12,8 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{ts,tsx,mjs}": "eslint --fix .",
-    "*.{ts,tsx,css,json,mjs}": "prettier --write ."
+    "*.{ts,tsx,mjs}": "eslint --fix",
+    "*.{ts,tsx,css,json,mjs}": "prettier --write"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",
